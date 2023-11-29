@@ -1,0 +1,798 @@
+Assignment No. 4
+
+
+a) Write a shell script to input a filename via command line arguments and print the type of file ( such as c prog, c++, text file, pdf file, doc file etc.) 
+
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <filename>"
+    exit 1
+fi
+
+file="$1"
+
+if [ ! -f "$file" ]; then
+    echo "File $file does not exist."
+    exit 1
+fi
+
+file_type=$(file "$file")
+
+if [[ $file_type == *C\ source* ]]; then
+    echo "$file is a C program."
+elif [[ $file_type == *C++\ source* ]]; then
+    echo "$file is a C++ program."
+elif [[ $file_type == *text* ]]; then
+    echo "$file is a text file."
+elif [[ $file_type == *PDF* ]]; then
+    echo "$file is a PDF file."
+elif [[ $file_type == *Word* ]]; then
+    echo "$file is a Word document."
+else
+    echo "File type for $file could not be determined."
+Fi
+
+
+
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 4thassigna.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 4thassigna.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./4thassigna.sh new.txt
+new.txt is a text file.
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+
+b) Write a shell script to input three numbers via command line arguments and print the largest among them. 
+
+#!/bin/bash
+
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <num1> <num2> <num3>"
+    exit 1
+fi
+
+num1="$1"
+num2="$2"
+num3="$3"
+
+largest="$num1"
+if [ "$num2" -gt "$largest" ]; then
+    largest="$num2"
+fi
+if [ "$num3" -gt "$largest" ]; then
+    largest="$num3"
+fi
+
+echo "The largest number among $num1, $num2, and $num3 is $largest."
+
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 4thassignb.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 4thassignb.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./4thassignb.sh 67 90 27
+The largest number among 67, 90, and 27 is 90.
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+c) Write a shell script to input two filenames in the current directory as arguments and print whether both files has equal number of lines. 
+
+
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <file1> <file2>"
+    exit 1
+fi
+
+file1="$1"
+file2="$2"
+
+if [ ! -f "$file1" ] || [ ! -f "$file2" ]; then
+    echo "One or both input files do not exist."
+    exit 1
+fi
+
+lines_file1=$(wc -l < "$file1")
+lines_file2=$(wc -l < "$file2")
+
+if [ "$lines_file1" -eq "$lines_file2" ]; then
+    echo "Both $file1 and $file2 have equal number of lines: $lines_file1"
+else
+    echo "$file1 has $lines_file1 lines and $file2 has $lines_file2 lines."
+Fi
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 4thassignc.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 4thassignc.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./4thassignc.sh newfile.txt trace.txt
+newfile.txt has 6 lines and trace.txt has 14 lines.
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+
+
+
+
+
+d) Write a shell script to input the registration number (2021UGA011) of a student print its branch.
+
+#!/bin/bash
+read -p "Enter registration number: " reg_number
+
+# Convert the input to lowercase
+reg_number_lower=$(echo "$reg_number" | tr '[:upper:]' '[:lower:]')
+
+case "$reg_number_lower" in
+    *ugcscs*)
+        branch="Computer Science Engineering"
+        ;;
+    *pgcaca*)
+        branch="MCA"
+        ;;
+    *pgcsca*)
+        branch="MCA"
+        ;;
+    *ugcvcv*)
+        branch="Civil Engineering"
+        ;;
+    *ugpipi*)
+        branch="Production Engineering"
+        ;;
+    *ugmtmt*)
+        branch="Metallurgy Engineering"
+        ;;
+    *)
+        branch="Unknown"
+        ;;
+esac
+echo "Branch: $branch"
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 4thassignd.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 4thassignd.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./4thassignd.sh
+Enter registration number: 2021pgcaca050
+Branch: MCA
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+
+
+
+Assignment No. 5
+
+
+a) Write a shell script that receives any number of file names as arguments checks if every argument supplied is a file or a directory and reports accordingly.whenever the argument is a file or directory. 
+
+#!/bin/bash
+
+for arg in "$@"; do
+    if [ -f "$arg" ]; then
+        echo "$arg is a file."
+    elif [ -d "$arg" ]; then
+        echo "$arg is a directory."
+    else
+        echo "$arg is neither a file nor a directory."
+    fi
+done
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 5thassigna.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 5thassigna.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./5thassigna.sh employee.txt
+first.c
+employee.txt is a file.
+first.c is a file.
+
+b) Write a shell script to input a number of random integers as arguments and print only the prime numbers.
+
+#!/bin/bash
+
+is_prime() {
+    num=$1
+    if [ "$num" -le 1 ]; then
+        return 1
+    fi
+    for ((i = 2; i * i <= num; i++)); do
+        if [ "$((num % i))" -eq 0 ]; then
+            return 1
+        fi
+    done
+    return 0
+}
+
+for num in "$@"; do
+    if is_prime "$num"; then
+        echo "$num is a prime number."
+    fi
+done
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 5thassignb.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 5thassignb.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./5thassignb.sh 7 9 4 13
+7 is a prime number.
+13 is a prime number.
+
+
+c) Write a shell script to input a file name and print the lines that contains numeric values in it.
+
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <file_name>"
+    exit 1
+fi
+
+file="$1"
+
+if [ ! -f "$file" ]; then
+    echo "File $file does not exist."
+    exit 1
+fi
+
+grep -E '[0-9]+' "$file"
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 5thassignc.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ chmod +x 5thassignc.sh
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./5thassignc.sh manager.txt
+7566 JONES MANAGER 7839 2-APR-1981 2975 20
+7698 BLAKE MANAGER 7839 1-MAY-1981 2850 30
+7782 CLARK MANAGER 7839 9-JUN-1981 2450 10
+
+
+
+Assignment No. 6
+
+
+a) Demonstrate the insertion, delection, and replacement of string using sed editor. 
+
+Smaple.txt
+This is a sample text file.
+Hello, World!
+This is a test.
+
+#insert
+sed '2a\
+New Line' sample.txt
+
+anubhav@DESKTOP-9VIA8NE:~$ vim sample.txt
+anubhav@DESKTOP-9VIA8NE:~$ sed '2a\
+New Line' sample.txt
+This is a sample text file.
+Hello, World!
+New Line
+This is a test.
+
+
+sed '3i\
+Inserted Text' sample.txt
+
+anubhav@DESKTOP-9VIA8NE:~$ sed '3i\
+Inserted Text' sample.txt
+This is a sample text file.
+Hello, World!
+Inserted Text
+This is a test.
+
+#delete
+sed -i '/test/d' sample.txt
+
+anubhav@DESKTOP-9VIA8NE:~$ sed -i '/test/d' sample.txt
+anubhav@DESKTOP-9VIA8NE:~$ cat sample.txt
+This is a sample text file.
+Hello, World!
+
+sed -i '2d' sample.txt
+
+anubhav@DESKTOP-9VIA8NE:~$ sed -i '2d' sample.txt
+anubhav@DESKTOP-9VIA8NE:~$ cat sample.txt
+This is a sample text file.
+
+
+#replacement
+sed -i 's/World/Universe/g' sample.txt
+
+sed -i '1s/sample/example/' sample.txt
+
+anubhav@DESKTOP-9VIA8NE:~$ sed -i 's/World/Universe/g' sample.txt
+anubhav@DESKTOP-9VIA8NE:~$ cat sample.txt
+This is a sample text file.
+example
+Universe
+anubhav@DESKTOP-9VIA8NE:~$ sed -i '1s/sample/example/' sample.txt
+anubhav@DESKTOP-9VIA8NE:~$ cat sample.txt
+This is a example text file.
+example
+Universe
+
+b) Write a awk script to print the details of all employees in employee.txt whose salary is greater than $2000.
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ awk '$6 > 2000 { print $1, $2, $3 $6}' employee.txt
+7566 JONES MANAGER2975
+7698 BLAKE MANAGER2850
+7782 CLARK MANAGER2450
+7788 SCOTT ANALYST3000
+7839 KING PRESIDENT5000
+7902 FORD ANALYST3000
+
++ 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+- 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+r 1.84471 2 1 cbr 210 ------  1 3.0 1.0 195 600
+r 1.84566 2 0 ack 40  ------  2 3.2 0.1 82  602
++ 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+- 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+r 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
++ 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+d 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+- 1.8461 2 3 cbr 210 ------- 0 0.0 3.1 192 511
+r 1.84612 3 2 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
+- 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84625 3 2 cbr 210 ------- 1 3.0 1.0 196 612
+
+c) write an awk script to read the above trace file and print the number of messages sent by each node. (here column 3 an 4 indicates the source and destination node id of the packet) 
+
+awk '{
+    source = $3
+    dest = $4
+    if (source ~ /^[0-9]+$/ && dest ~ /^[0-9]+$/) {
+        sent[source]++
+        sent[dest]++
+    }
+}
+END {
+    for (node in sent) {
+        print "Node " node ": " sent[node] " messages sent"
+    }
+}' trace.txt
+
+Node 0: 5 messages sent
+Node 1: 3 messages sent
+Node 2: 14 messages sent
+Node 3: 6 messages sent
+
+d) Write an awk script to read the above trace file and print the total amount of bytes exchanged during network communications. (the column 6 represents the size of a message)
+
+awk '{
+    if ($6 ~ /^[0-9]+$/) {
+        total_bytes += $6
+    }
+}
+END {
+    print "Total Bytes Exchanged: " total_bytes " bytes"
+}' trace.txt
+
+Output: Total Bytes Exchanged: 4350 bytes.
+
+
+
+
+Assignment No. 7
+
+
+a) Write a C Program that makes a copy of a file using standard I/O and system calls.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: %s <source_file> <destination_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *source = fopen(argv[1], "rb");
+    if (!source) {
+        perror("Source file");
+        return 1;
+    }
+
+    FILE *destination = fopen(argv[2], "wb");
+    if (!destination) {
+        perror("Destination file");
+        fclose(source);
+        return 1;
+    }
+
+    char buffer[1024];
+    size_t bytes_read;
+
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), source)) > 0) {
+        fwrite(buffer, 1, bytes_read, destination);
+    }
+
+    fclose(source);
+    fclose(destination);
+
+    printf("File copied successfully.\n");
+    return 0;
+} 
+
+anubhav@DESKTOP-9VIA8NE:~$ vim 7thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~$ gcc 7thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~$ cd anubhav_oslab
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 7thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 7thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out source.txt destination.txt
+File copied successfully.
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ cat destination.txt
+anubhav_oslab/manager.txt
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+
+b) Write in C the following Unix commands using system calls 
+i) cat
+
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    char ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+    fclose(file);
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 7thAssignbi.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 7thAssignbi.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out trace.txt
++ 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+- 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+r 1.84471 2 1 cbr 210 ------  1 3.0 1.0 195 600
+r 1.84566 2 0 ack 40  ------  2 3.2 0.1 82  602
++ 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+- 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+r 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
++ 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+d 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+- 1.8461 2 3 cbr 210 ------- 0 0.0 3.1 192 511
+r 1.84612 3 2 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
+- 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84625 3 2 cbr 210 ------- 1 3.0 1.0 196 612
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$
+
+ ii) cp 
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <source_file> <destination_file>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *source = fopen(argv[1], "rb");
+    if (source == NULL) {
+        perror("Error opening source file");
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *destination = fopen(argv[2], "wb");
+    if (destination == NULL) {
+        perror("Error opening destination file");
+        fclose(source);
+        exit(EXIT_FAILURE);
+    }
+
+    char ch;
+    while ((ch = fgetc(source)) != EOF) {
+        fputc(ch, destination);
+    }
+
+    fclose(source);
+    fclose(destination);
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 7thAssignbii.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 7thAssignbii.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out trace.txt new.txt
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ cat new.txt
++ 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+- 1.84375 0 2 cbr 210 ------  0 0.0 3.1 225 610
+r 1.84471 2 1 cbr 210 ------  1 3.0 1.0 195 600
+r 1.84566 2 0 ack 40  ------  2 3.2 0.1 82  602
++ 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+- 1.84566 0 2 tcp 1000 ------ 2 0.1 3.2 102 611
+r 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
++ 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+d 1.84609 2 3 cbr 210 ------- 0 0.0 3.1 225 610
+- 1.8461 2 3 cbr 210 ------- 0 0.0 3.1 192 511
+r 1.84612 3 2 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
+- 1.84612 2 1 cbr 210 ------- 1 3.0 1.0 196 603
++ 1.84625 3 2 cbr 210 ------- 1 3.0 1.0 196 612
+
+
+c) Write a C program to list files in a directory
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <directory>\n", argv[0]);
+        return 1;
+    }
+
+    DIR *dir = opendir(argv[1]);
+    if (!dir) {
+        perror("opendir");
+        return 1;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    return 0;
+} 
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 7thAssignc.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc -o 7thAssignc 7thAssignc.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./7thAssignc .
+3rdassignfile.txt
+trace.txt
+3rdAssignb.sh
+7thAssignc.c
+4thassigna.sh
+manager.txt
+\
+7thAssignc
+c_progams
+clerk.txt
+5thassigna.sh
+5thassignb.sh
+5thassignc.sh
+4thassignb.sh
+4thassignd.sh
+first.c
+7thAssignbi.c
+source.txt
+my_cat
+newfile.txt
+newemp.txt
+e.awk
+employee.txt
+a.out
+3rdAssignd.sh
+7thAssignbii.c
+my_cp
+..
+filter_1981.awk
+
+
+d) Write a C program to list for every file in a directory, its inode number and file name.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <directory>\n", argv[0]);
+        return 1;
+    }
+
+    DIR *dir = opendir(argv[1]);
+    if (!dir) {
+        perror("opendir");
+        return 1;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        char filepath[1024];
+        snprintf(filepath, sizeof(filepath), "%s/%s", argv[1], entry->d_name);
+
+        struct stat st;
+        if (stat(filepath, &st) == 0) {
+            printf("Inode: %ld, File: %s\n", st.st_ino, entry->d_name);
+        }
+    }
+
+    closedir(dir);
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 7thAssignd.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc -o 7thAssignd 7thAssignd.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./7thAssignd .
+Inode: 29412, File: 3rdassignfile.txt
+Inode: 29457, File: trace.txt
+Inode: 29456, File: 3rdAssignb.sh
+Inode: 6077, File: 7thAssignc.c
+Inode: 29413, File: 4thassigna.sh
+Inode: 29428, File: manager.txt
+Inode: 29430, File: \
+Inode: 6088, File: 7thAssignc
+Inode: 29453, File: c_progams
+Inode: 29422, File: clerk.txt
+Inode: 6082, File: 7thAssignd.c
+Inode: 29419, File: 5thassigna.sh
+Inode: 29420, File: 5thassignb.sh
+Inode: 29421, File: 5thassignc.sh
+Inode: 29415, File: 4thassignb.sh
+Inode: 29418, File: 4thassignd.sh
+Inode: 29427, File: first.c
+Inode: 6071, File: 7thAssignbi.c
+Inode: 6046, File: source.txt
+Inode: 6083, File: my_cat
+
+
+
+Assignment No. 8
+
+
+a) Write a C program to create a child process and allow the parent to display ‘parent‛ and the child to display ‚child‛ on the screen.
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        printf("Child process: child\n");
+    } else if (pid > 0) {
+        printf("Parent process: parent\n");
+    } else {
+        perror("fork");
+        return 1;
+    }
+
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 8thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 8thAssigna.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out
+Parent process: parent
+Child process: child 
+
+b) Write a C program to create a Zombie and orphan process. 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main() {
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        // Child process
+        printf("Child process: sleeping...\n");
+        sleep(5);
+        printf("Child process: exiting.\n");
+        exit(0);
+    } else if (child_pid > 0) {
+        // Parent process
+        printf("Parent process: waiting for child...\n");
+        wait(NULL); // Wait for any child process to exit
+        printf("Parent process: exiting.\n");
+    } else {
+        perror("fork");
+        return 1;
+    }
+
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 8thAssignb.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 8thAssignb.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out
+Parent process: waiting for child...
+Child process: sleeping...
+Child process: exiting.
+Parent process: exiting.
+
+c) Write a program that illustrates how to execute two commands concurrently. 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        // Child process
+        execlp("ls", "ls", "-l", NULL);
+    } else if (pid > 0) {
+        // Parent process
+        printf("Parent process: Waiting for child...\n");
+        wait(NULL);
+        printf("Parent process: Child process has completed.\n");
+    } else {
+        perror("fork");
+        return 1;
+    }
+
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ rm 8thAssignc.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 8thAssignc.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc -o 8thAssignc 8thAssignc.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./8thAssignc
+Parent process: Waiting for child...
+total 252
+-rwxr-xr-x 1 anubhav anubhav   216 Sep 20 10:37  3rdAssigna.sh
+-rwxr-xr-x 1 anubhav anubhav   274 Sep 20 10:39  3rdAssignb.sh
+-rw-r--r-- 1 anubhav anubhav   258 Aug 24 09:29  3rdAssignc.sh
+-rw-r--r-- 1 anubhav anubhav   344 Aug 24 09:30  3rdAssignd.sh
+-rw-r--r-- 1 anubhav anubhav  1024 Aug 24 09:32  3rdassignfile.txt
+-rw-r--r-- 1 anubhav anubhav   635 Aug 24 18:48  4thassigna.sh
+-rw-r--r-- 1 anubhav anubhav   330 Aug 24 18:50  4thassignb.sh
+-rw-r--r-- 1 anubhav anubhav   496 Aug 24 18:53  4thassignc.sh
+-rw-r--r-- 1 anubhav anubhav   619 Aug 24 19:16  4thassignd.sh
+-rw-r--r-- 1 anubhav anubhav   233 Aug 24 19:21  5thassigna.sh
+-rw-r--r-- 1 anubhav anubhav   332 Aug 24 19:32  5thassignb.sh
+-rw-r--r-- 1 anubhav anubhav   201 Aug 24 19:37  5thassignc.sh
+-rw-r--r-- 1 anubhav anubhav   750 Sep 21 11:13  7thAssigna.c
+-rw-r--r-- 1 anubhav anubhav   442 Sep 21 11:17  7thAssignbi.c
+-rw-r--r-- 1 anubhav anubhav   702 Sep 21 11:21  7thAssignbii.c
+-rwxr-xr-x 1 anubhav anubhav 16184 Sep 21 11:26  
+-rwxr-xr-x 1 anubhav anubhav 16264 Sep 21 11:21  my_cp
+-rw-r--r-- 1 anubhav anubhav   320 Sep 14 09:19  newemp.txt
+-rw-r--r-- 1 anubhav anubhav   320 Sep 21 11:21  newfile.txt
+-rw-r--r-- 1 anubhav anubhav    26 Sep 21 11:12  source.txt
+-rw-r--r-- 1 anubhav anubhav   671 Sep 21 09:01  trace.txt
+Parent process: Child process has completed.
+
+d) Write a C program that illustrates suspending and resuming processes using signals.
+
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+void handler(int signum) {
+    printf("Signal received: %d\n", signum);
+}
+
+int main() {
+    signal(SIGUSR1, handler);
+
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        // Child process
+        printf("Child process: sending signal to parent...\n");
+        kill(getppid(), SIGUSR1);
+        sleep(2);
+        printf("Child process: exiting.\n");
+    } else if (child_pid > 0) {
+        // Parent process
+        printf("Parent process: waiting for signal...\n");
+        int status;
+        wait(&status); // Wait for the child process to finish
+        printf("Parent process: signal received.\n");
+    } else {
+        perror("fork");
+        return 1;
+    }
+
+    return 0;
+}
+
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ vim 8thAssignd.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ gcc 8thAssignd.c
+anubhav@DESKTOP-9VIA8NE:~/anubhav_oslab$ ./a.out
+Parent process: waiting for signal...
+Child process: sending signal to parent...
+Signal received: 10
+Child process: exiting.
+Parent process: signal received.
+
+
+
